@@ -63,8 +63,12 @@ class ProductsController extends Controller
     {
         $grid = new Grid(new Product);
 
+
         $grid->id('ID')->sortable();
         $grid->title('商品名称');
+        $grid->model()->with(['category']);
+        // Laravel-Admin 支持用符号 . 来展示关联关系的字段
+        $grid->column('category.name', '类目');
         $grid->on_sale('已上架')->display(function ($value) {
             return $value ? '是' : '否';
         });
@@ -115,6 +119,14 @@ class ProductsController extends Controller
             $form->text('price', '单价')->rules('required|numeric|min:0.01');
             $form->text('stock', '剩余库存')->rules('required|integer|min:0');
         });
+
+         // 添加一个类目字段，与之前类目管理类似，使用 Ajax 的方式来搜索添加
+        $form->select('category_id', '类目')->options(function ($id) {
+            $category = Category::find($id);
+            if ($category) {
+                return [$category->id => $category->full_name];
+            }
+        })->ajax('/admin/api/categories?is_directory=0');
 
         // 定义事件回调，当模型即将保存时会触发这个回调
         $form->saving(function (Form $form) {
