@@ -65,7 +65,7 @@ class ProductsController extends Controller
                 'search' => $search,
                 'order'  => $order,
             ],
-            
+
             // 等价于 isset($category) ? $category : null
             'category' => $category ?? null,
         ]);
